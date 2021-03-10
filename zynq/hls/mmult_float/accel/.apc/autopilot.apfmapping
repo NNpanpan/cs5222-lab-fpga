@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<autopilotfilemapping:AutoPilotFileMapping xmlns:autopilotfilemapping="www.autoesl.com/autopilotfilemapping">
+  <source>
+    <originFiles name="mmult_float.cpp" path="/home/nhat/Desktop/code/cs5222-lab-fpga/zynq/hls/mmult_float/mmult_float.cpp"/>
+  </source>
+  <testbench>
+    <originFiles name="mmult_test.cpp" path="/home/nhat/Desktop/code/cs5222-lab-fpga/zynq/hls/mmult_float/mmult_test.cpp"/>
+  </testbench>
+</autopilotfilemapping:AutoPilotFileMapping>

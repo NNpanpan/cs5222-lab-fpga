@@ -1,0 +1,25 @@
+INFO: [SIM 2] *************** CSIM start ***************
+INFO: [SIM 4] CSIM will launch GCC as the compiler.
+   Compiling ../../../../mmult_test.cpp in debug mode
+   Compiling ../../../../mmult_float.cpp in debug mode
+   Generating csim.exe
+DEBUGGING AXI4 STREAMING DATA TYPES!
+t = 0, out of 2048
+t = 128, out of 2048
+t = 256, out of 2048
+t = 384, out of 2048
+t = 512, out of 2048
+t = 640, out of 2048
+t = 768, out of 2048
+t = 896, out of 2048
+t = 1024, out of 2048
+t = 1152, out of 2048
+t = 1280, out of 2048
+t = 1408, out of 2048
+t = 1536, out of 2048
+t = 1664, out of 2048
+t = 1792, out of 2048
+t = 1920, out of 2048
+Matrices identical ... Test successful!
+INFO: [SIM 1] CSim done with 0 errors.
+INFO: [SIM 3] *************** CSIM finish ***************
