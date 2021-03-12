@@ -1,8 +1,8 @@
 # Lab: Custom Acceleration with FPGAs
 
-**Part 1 Due** Thursday, March 12th at 17:00 via the LumiNUS dropbox.<br/>
-**Part 2 Due** Thursday, March 19th at 17:00 via the LumiNUS dropbox.<br/>
-**Part 3 Due** Thursday, March 26th at 17:00 via the LumiNUS dropbox.
+**Part 1 Due** Thursday, March 14th at 23:59 via the LumiNUS dropbox.<br/>
+**Part 2 Due** Thursday, March 21th at 23:59 via the LumiNUS dropbox.<br/>
+**Part 3 Due** Thursday, March 28th at 23:59 via the LumiNUS dropbox.
 
 Questions about this assignment should be sent to the IVLE Project forum.
 
@@ -105,7 +105,7 @@ source <install_path>/Vivado/2017.1/settings64.sh
 ### PYNQ board
 
 The PYNQ board website complete with documentation and forums is available [here](http://www.pynq.io/).
-Follow the **Getting Started** tutorial to get your Pynq board set up (please read the notes below first).
+Follow the **Getting Started** tutorial to get your Pynq board set up (please read the notes below first). Note that if you have any issues with the board (booting problems, Python errors, etc.), consider flashing your SD card with [version 1.4 of the Pynq runtime](https://github.com/Xilinx/PYNQ/releases/tag/v1.4). 
 
 **SD card flashing notes**
 * We recommend using [Etcher](https://etcher.io/) for one-step SD-card flashing. You can download the image for the SD card on the PYNQ board [website](http://www.pynq.io/).
