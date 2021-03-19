@@ -26,23 +26,85 @@ void mmult_hw (AXI_VAL in_stream[IS_SIZE], AXI_VAL out_stream[OS_SIZE])
 	// Input and output AXI stream indices
 	int is_idx = 0;
 	int os_idx = 0;
+	
+	// Mask
+	// Last 32, 8, 8 bits
+	axi_T mask_lsb_32 = ((axi_T) -1) >> 32;
+	axi_T mask_lsb_8 = ((axi_T) -1) >> 56;
+	
+	#pragma HLS ARRAY_PARTITION variable=in_buf block factor=32 dim=2
+	#pragma HLS ARRAY_PARTITION variable=weight_buf block factor=32 dim=2
 
 	// Stream in offset vector
-	// CSE548 TODO
+	LOAD_OFF_1: for (int i = 0; i < CLASSES; i+=OUT_WIDTH_RATIO) {
+		#pragma HLS PIPELINE II=1
+		
+		axi_T raw = pop_stream(in_stream[is_idx++]);
+		
+		offset_buf[i+1] = raw >> OUT_WIDTH;
+		offset_buf[i+0] = raw & mask_lsb_32;
+	}
 
 	// Stream in weight matrix
-	// CSE548 TODO
+	LOAD_W_1: for (int i = 0; i < CLASSES; i++) {
+		LOAD_W_2: for (int j = 0; j < FEAT; j+=W_WIDTH_RATIO) {
+			#pragma HLS PIPELINE II=1
+			
+			// Pop AXI data packet
+			axi_T raw = pop_stream(in_stream[is_idx++]);
+			
+			for (int w = 0; w < W_WIDTH; w++) {
+				int shift = w * W_WIDTH;
+				weight_buf[i][j+w] = (raw >> shift) & mask_lsb_8;
+			}
+			
+			/*
+			weight_buf[i][j+7] = raw >> 56;
+			weight_buf[i][j+6] = (raw >> 48) & mask_lsb_8;
+			weight_buf[i][j+5] = (raw >> 40) & mask_lsb_8;
+			weight_buf[i][j+4] = (raw >> 32) & mask_lsb_8;
+			weight_buf[i][j+3] = (raw >> 24) & mask_lsb_8;
+			weight_buf[i][j+2] = (raw >> 16) & mask_lsb_8;
+			weight_buf[i][j+1] = (raw >> 8) & mask_lsb_8;
+			weight_buf[i][j+0] = raw & mask_lsb_8;
+			*/
+		}
+	}
 
 	// Iterate over tiles
 	LT: for (int t = 0; t < BATCH; t+=TILING) {
 
 		// Stream in input tile
-		// CSE548 TODO
+		LOAD_I_1: for (int i = 0; i < TILING; i++) {
+			LOAD_I_2: for (int j = 0; j < FEAT; j+=IN_WIDTH_RATIO) {
+				#pragma HLS PIPELINE II=1
+				
+				// Pop AXI data packet
+				axi_T raw = pop_stream(in_stream[is_idx++]);
+			
+				for (int w = 0; w < IN_WIDTH; w++) {
+					int shift = w * IN_WIDTH;
+					in_buf[i][j+w] = (raw >> shift) & mask_lsb_8;
+				}
+				/*
+				in_buf[i][j+7] = raw >> 56;
+				in_buf[i][j+6] = (raw >> 48) & mask_lsb_8;
+				in_buf[i][j+5] = (raw >> 40) & mask_lsb_8;
+				in_buf[i][j+4] = (raw >> 32) & mask_lsb_8;
+				in_buf[i][j+3] = (raw >> 24) & mask_lsb_8;
+				in_buf[i][j+2] = (raw >> 16) & mask_lsb_8;
+				in_buf[i][j+1] = (raw >> 8) & mask_lsb_8;
+				in_buf[i][j+0] = raw & mask_lsb_8;
+				*/
+			}
+		}
 
 		// Perform matrix multiplication
 		L1: for (int i = 0; i < TILING; i++) {
 			// Iterate over output classes
 			L2: for (int j = 0; j < CLASSES; j++) {
+				#pragma HLS PIPELINE II=1
+				
 				// Perform the dot product
 				out_T tmp = offset_buf[j];
 				L3: for(int k = 0; k < FEAT; k++) {
@@ -54,7 +116,17 @@ void mmult_hw (AXI_VAL in_stream[IS_SIZE], AXI_VAL out_stream[OS_SIZE])
 		}
 
 		// Stream out output matrix
-		// CSE548 TODO
+		STORE_O_1: for (int i = 0; i < TILING; i++) {
+			STORE_O_2: for (int j = 0; j < CLASSES; j+=OUT_WIDTH_RATIO) {
+				#pragma HLS PIPELINE II=1
+				
+				// Push output element into AXI stream
+				axi_T out_packet = (axi_T) out_buf[i][j+1] << OUT_WIDTH;
+				out_packet += out_buf[i][j+0] & mask_lsb_32;
+				
+				out_stream[os_idx++] = push_stream(out_packet, os_idx == (OS_SIZE));
+			}
+		}
 	}
 }
 

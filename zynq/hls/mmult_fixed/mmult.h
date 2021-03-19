@@ -30,8 +30,7 @@ typedef unsigned long long axi_T;
 #define CLASSES 10
 
 // Input matrix tiling factor
-// CSE548: TODO
-// #define TILING
+#define TILING 512
 
 // Input/Output Stream Size
 #define IS_SIZE ((CLASSES+OUT_WIDTH_RATIO-1)/OUT_WIDTH_RATIO+CLASSES*FEAT/W_WIDTH_RATIO+BATCH*FEAT/IN_WIDTH_RATIO)
