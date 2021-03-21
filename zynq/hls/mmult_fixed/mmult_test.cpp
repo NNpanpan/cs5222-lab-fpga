@@ -132,7 +132,11 @@ int main(void)
 				std::cout << i << "," << j << ": expected " << output_sw[i][j] << " but got " << output_hw[i][j] << std::endl;
 			}
 		}
+		if (err > 0) {
+			break;
+		}
 	}
+	
 
 	if (err == 0)
 		printf("Matrices identical ... Test successful!\r\n");

@@ -11,6 +11,8 @@ void mmult_hw (AXI_VAL in_stream[IS_SIZE], AXI_VAL out_stream[OS_SIZE])
 #pragma HLS INTERFACE axis      port=in_stream
 #pragma HLS INTERFACE axis      port=out_stream
 
+// #pragma HLS RESOURCE variable=mult core=Mul_LUT
+
 	// Assertions (to avoid out of array bound writes)
 	assert(BATCH%TILING==0);
 	assert(FEAT%W_WIDTH_RATIO==0);
@@ -57,17 +59,6 @@ void mmult_hw (AXI_VAL in_stream[IS_SIZE], AXI_VAL out_stream[OS_SIZE])
 				int shift = w * W_WIDTH;
 				weight_buf[i][j+w] = (raw >> shift) & mask_lsb_8;
 			}
-			
-			/*
-			weight_buf[i][j+7] = raw >> 56;
-			weight_buf[i][j+6] = (raw >> 48) & mask_lsb_8;
-			weight_buf[i][j+5] = (raw >> 40) & mask_lsb_8;
-			weight_buf[i][j+4] = (raw >> 32) & mask_lsb_8;
-			weight_buf[i][j+3] = (raw >> 24) & mask_lsb_8;
-			weight_buf[i][j+2] = (raw >> 16) & mask_lsb_8;
-			weight_buf[i][j+1] = (raw >> 8) & mask_lsb_8;
-			weight_buf[i][j+0] = raw & mask_lsb_8;
-			*/
 		}
 	}
 
@@ -86,16 +77,6 @@ void mmult_hw (AXI_VAL in_stream[IS_SIZE], AXI_VAL out_stream[OS_SIZE])
 					int shift = w * IN_WIDTH;
 					in_buf[i][j+w] = (raw >> shift) & mask_lsb_8;
 				}
-				/*
-				in_buf[i][j+7] = raw >> 56;
-				in_buf[i][j+6] = (raw >> 48) & mask_lsb_8;
-				in_buf[i][j+5] = (raw >> 40) & mask_lsb_8;
-				in_buf[i][j+4] = (raw >> 32) & mask_lsb_8;
-				in_buf[i][j+3] = (raw >> 24) & mask_lsb_8;
-				in_buf[i][j+2] = (raw >> 16) & mask_lsb_8;
-				in_buf[i][j+1] = (raw >> 8) & mask_lsb_8;
-				in_buf[i][j+0] = raw & mask_lsb_8;
-				*/
 			}
 		}
 
