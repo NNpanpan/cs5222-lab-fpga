@@ -34,12 +34,12 @@ void mmult_hw (AXI_VAL in_stream[IS_SIZE], AXI_VAL out_stream[OS_SIZE])
 	axi_T mask_lsb_32 = ((axi_T) -1) >> 32;
 	axi_T mask_lsb_8 = ((axi_T) -1) >> 56;
 	
-	#pragma HLS ARRAY_PARTITION variable=in_buf block factor=32 dim=2
-	#pragma HLS ARRAY_PARTITION variable=weight_buf block factor=32 dim=2
+	#pragma HLS ARRAY_PARTITION variable=in_buf block factor=64 dim=2
+	#pragma HLS ARRAY_PARTITION variable=weight_buf block factor=64 dim=2
 
 	// Stream in offset vector
 	LOAD_OFF_1: for (int i = 0; i < CLASSES; i+=OUT_WIDTH_RATIO) {
-		#pragma HLS PIPELINE II=1
+		#pragma HLS PIPELINE II=1 rewind
 		
 		axi_T raw = pop_stream(in_stream[is_idx++]);
 		
@@ -68,7 +68,7 @@ void mmult_hw (AXI_VAL in_stream[IS_SIZE], AXI_VAL out_stream[OS_SIZE])
 		// Stream in input tile
 		LOAD_I_1: for (int i = 0; i < TILING; i++) {
 			LOAD_I_2: for (int j = 0; j < FEAT; j+=IN_WIDTH_RATIO) {
-				#pragma HLS PIPELINE II=1
+				#pragma HLS PIPELINE II=1 rewind
 				
 				// Pop AXI data packet
 				axi_T raw = pop_stream(in_stream[is_idx++]);
@@ -84,7 +84,7 @@ void mmult_hw (AXI_VAL in_stream[IS_SIZE], AXI_VAL out_stream[OS_SIZE])
 		L1: for (int i = 0; i < TILING; i++) {
 			// Iterate over output classes
 			L2: for (int j = 0; j < CLASSES; j++) {
-				#pragma HLS PIPELINE II=1
+				#pragma HLS PIPELINE II=1 rewind
 				
 				// Perform the dot product
 				out_T tmp = offset_buf[j];

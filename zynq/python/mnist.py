@@ -71,7 +71,7 @@ def getIterator(args, mode):
     for i in xrange(len(lbl)):
         yield get_img(i)
 
-def getDataSet(args, mode):
+def getDataSet(args, mode, sgd=False):
     """
     Produces scaled down, flattened dataset
     """
@@ -106,7 +106,7 @@ def getDataSet(args, mode):
             print 'Label: {}'.format(lab)
 
         data.append(datum)
-        labels.append(label)
+        labels.append(lab) if sgd else labels.append(label)
 
     return np.array(data), np.array(labels)
 
@@ -117,7 +117,7 @@ def parse_args():
                         help='the input data directory')
     parser.add_argument('--num-examples', type=int, default=8,
                         help='the number of training examples')
-    parser.add_argument('--dim', type=int, default=16,
+    parser.add_argument('--dim', type=int, default=8,
                         help='height and width of mnist dataset to resize to')
     parser.add_argument('--debug', action='store_true',
                         help='debug mode')
@@ -127,19 +127,19 @@ if __name__ == '__main__':
     args = parse_args()
 
     # Extract the training dataset
-    train_data, train_labels = getDataSet(args, 'train')
+    train_data, train_labels = getDataSet(args, 'train', sgd=True)
     # Extract the training dataset
-    test_data, test_labels = getDataSet(args, 'test')
-
+    test_data, test_labels = getDataSet(args, 'test', sgd=True)
+    
     # Linear regression
-    reg = linear_model.Ridge()
+    reg = linear_model.SGDClassifier(loss='log', penalty='l1', learning_rate='optimal')
     reg.fit(train_data, train_labels)
 
     # Perform prediction with model
     float_labels = reg.predict(test_data)
 
     # Fixed point computation
-    SCALE = (2**18 - 1) / (2 * max(
+    SCALE = (2**8 - 1) / (2 * max(
         np.amax(np.abs(reg.coef_)), np.amax(np.abs(reg.intercept_))
         ))
     
@@ -154,18 +154,19 @@ if __name__ == '__main__':
     i_p = np.append(ones, test_data, axis=1)
     w_p = np.append(offset.reshape(10,1), weight, axis=1)
     fixed_labels = np.dot(i_p, w_p.T)
-
+     
     # Measure Validation Errors
     float_errors = 0
     for idx, label in enumerate(test_labels):
-        guess_label = np.argmax(float_labels[idx])
-        actual_label = np.argmax(label)
+        guess_label = float_labels[idx] # np.argmax(float_labels[idx])
+        actual_label = label # np.argmax(label)
         if (guess_label!=actual_label):
             float_errors += 1.
+    
     fixed_errors = 0
     for idx, label in enumerate(test_labels):
         guess_label = np.argmax(fixed_labels[idx])
-        actual_label = np.argmax(label)
+        actual_label = label # np.argmax(label)
         if (guess_label!=actual_label):
             fixed_errors += 1.
 
@@ -174,6 +175,7 @@ if __name__ == '__main__':
     print 'Min/Max of intersect values [{}, {}]'.format(reg.intercept_.min(),reg.intercept_.max())
     print 'Misclassifications (float) = {0:.2f}%'.format(float_errors/len(test_labels)*100)
     print 'Misclassifications (fixed) = {0:.2f}%'.format(fixed_errors/len(test_labels)*100)
+    # exit(0)
 
     # Dump the model and test data
     np.save('test_data', test_data)

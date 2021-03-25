@@ -26,7 +26,7 @@ typedef unsigned long long axi_T;
 
 // Matrix dimensions specifications
 #define BATCH 8192
-#define FEAT 256
+#define FEAT 64
 #define CLASSES 10
 
 // Input matrix tiling factor
